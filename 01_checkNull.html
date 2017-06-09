@@ -1,9 +1,26 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="utf-8">
-    </head>
-    <body>
-    <script></script>
-    </body>
+<head>
+	<meta charset="utf-8">
+</head>
+<body>
+	<script>
+		var isTure=function(aValue){
+			var temp;
+			if(aValue){
+				temp=true;
+			}else{
+				temp=false;
+			}
+			return temp;
+		}
+		console.log(isTure(null));
+		console.log(isTure(undefined));
+		console.log(isTure(NaN));
+		console.log(isTure(""));
+		console.log(isTure(0));
+		console.log(isTure(false));
+		console.log(isTure("1"))
+	</script>
+</body>
 </html>
