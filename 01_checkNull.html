@@ -33,6 +33,7 @@
 			}
 			return temp;
 		}
+		console.log("check value is null")
 		console.log(isNull(null));
 		console.log(isNull(undefined));
 		console.log(isNull(NaN));
@@ -40,7 +41,25 @@
 		console.log(isNull(0));
 		console.log(isNull(false));
 		console.log(isNull("1"));
-	//the other way of checking value is null 
+	//the other way of checking value is null
+		var isNullOther=function(aValue){
+			var temp;
+			if (!aValue && typeof aValue != "undefined" && aValue!= 0&& typeof aValue=="object")
+			{
+				temp=true;
+			}else{
+				temp=false;
+			}
+			return temp;
+		}
+		console.log("the other way of checking value is null");
+		console.log(isNullOther(null));
+		console.log(isNullOther(undefined));
+		console.log(isNullOther(NaN));
+		console.log(isNullOther(""));
+		console.log(isNullOther(0));
+		console.log(isNullOther(false));
+		console.log(isNullOther("1"));
 	</script>
 </body>
 </html>
