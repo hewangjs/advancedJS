@@ -5,6 +5,7 @@
 </head>
 <body>
 	<script>
+	//check value is false
 		var isTure=function(aValue){
 			var temp;
 			if(aValue){
@@ -20,7 +21,26 @@
 		console.log(isTure(""));
 		console.log(isTure(0));
 		console.log(isTure(false));
-		console.log(isTure("1"))
+		console.log(isTure("1"));
+
+	//check value is null
+		var isNull=function(aValue){
+			var temp;
+			if(aValue===null){
+				temp=true;
+			}else{
+				temp=false;
+			}
+			return temp;
+		}
+		console.log(isNull(null));
+		console.log(isNull(undefined));
+		console.log(isNull(NaN));
+		console.log(isNull(""));
+		console.log(isNull(0));
+		console.log(isNull(false));
+		console.log(isNull("1"));
+	//the other way of checking value is null 
 	</script>
 </body>
 </html>
