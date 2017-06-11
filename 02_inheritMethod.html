@@ -6,6 +6,8 @@
     <body>
     <script>
     //类的原型对象的作用就是为类的原型添加共有方法，但类不能直接访问这些属性和方法，必须通过原型prototype来访问。
+    //实例化一个父类的时候，新创建的对象复制了父类的构造函数内的属性与方法并且将原型_proto_指向了父类的原型对象，这样就拥有了父类的原型对象上的属性方法
+    //并且这个新创建的对象可以直接访问父类原型对象上的属性与方法。如果将这个新创建的对象赋值给子类的原型，那么子类的原型就可以访问到父类的原型属性和方法。
     //inherit by the way like class method
     //declare superclass
     function SuperClass(){
@@ -28,6 +30,13 @@
     var instance=new SubClass();
     console.log(instance.getSuperValue());
     console.log(instance.getSubValue());
+    //instanceof来检测某个对象是否是某个类的实例
+    console.log(instance instanceof SuperClass);//true
+    console.log(instance instanceof SubClass);//true
+    console.log(SubClass instanceof SuperClass);//false
+    console.log(SubClass.prototype instanceof SuperClass);
+    console.log("创建的所有对象都是Object的实例");
+    console.log(instance instanceof Object);
     </script>
     </body>
 </html>
