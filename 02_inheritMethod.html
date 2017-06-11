@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+    </head>
+    <body>
+    <script>
+    //类的原型对象的作用就是为类的原型添加共有方法，但类不能直接访问这些属性和方法，必须通过原型prototype来访问。
+    //inherit by the way like class method
+    //declare superclass
+    function SuperClass(){
+    	this.superValue="superValue";
+    }
+    //add common method for superclass
+    SuperClass.prototype.getSuperValue=function(){
+    	return this.superValue;
+    }
+    // declare subcalss
+    function SubClass(){
+    	this.subValue="subValue";
+    }
+    //inherit SuperClass
+    SubClass.prototype=new SuperClass();
+    //add common method for subclass
+    SubClass.prototype.getSubValue=function(){
+    	return this.subValue;
+    }
+    var instance=new SubClass();
+    console.log(instance.getSuperValue());
+    console.log(instance.getSubValue());
+    </script>
+    </body>
+</html>
