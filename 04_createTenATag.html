@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+    </head>
+    <body>
+    <script>
+    var i;
+    for(i=0;i<10;i++){
+    	(function(i){
+    		var a=document.createElement('a');
+    		a.innerHTML=i+'<br>';
+    		a.addEventListener('click',function(e){
+    			e.preventDefault();
+    			alert(i)
+    		});
+    		document.body.appendChild(a);
+    	})(i)//这个i是指将参数i传递给里面的function，进行自执行
+    }
+    </script>
+    </body>
+</html>
