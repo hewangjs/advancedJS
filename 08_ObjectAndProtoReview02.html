@@ -5,6 +5,7 @@
 </head>
 <body>
 	<script>
+	//构造函数、原型对象、实例三者之间的指向关系
 	function Person(){
 
 	}
@@ -38,6 +39,9 @@
 	//isPrototypeOf()方法的对象（Person.prototype），那么这个方法返回true
 	console.log(Person.prototype.isPrototypeOf(person1));
 	console.log(Person.prototype.isPrototypeOf(person2));
+	//Object.getPrototypeOf()返回[[Prototype]]的值
+	console.log(Object.getPrototypeOf(person1)==Person.prototype);
+	console.log(Object.getPrototypeOf(person1).name);
 	</script>
 </body>
 </html>
