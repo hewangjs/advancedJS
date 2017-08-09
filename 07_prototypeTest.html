@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+</head>
+<body>
+	<script>
+		var A = {n:4399};
+		var B = function(){this.n = 9999;}
+		var C = function(){var n = 8888;}
+		B.prototype=A;
+		C.prototype=A;
+		var b = new B();
+		var c = new C();
+		A.n++;
+		console.log(b.n);
+		console.log(c.n);
+		//new运算的具体过程：
+		//1）创建一个空对象
+		//2）把这个空对象的_proto_指向构造函数的prototype
+		//3）把这个空对象赋值给this
+		//4）执行构造函数内部的代码，注意此时的this指向新对象，this.n=9999等价于b.n=9999;
+		//然后访问b.n,存在，直接输出b.n
+		//再去访问c.n，不存在，通过原型链_protype_,c._proto_指向C.prototype也就是A，所以就是输出A.n
+	</script>
+</body>
+</html>

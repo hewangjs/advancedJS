@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+    </head>
+    <body>
+    <script>
+    var arr=[3,4,5,3,6];
+    function newArrDivied(arr){
+    	var newArr=[];
+    	if(arr[0]===0||arr.length===0){
+    		return "invalid data";
+    	}else{
+    		for(var i=0;i<arr.length;i++){
+    			newArr[i]=arr[i]/arr[0];
+    		}
+    		return newArr;
+    	}
+    }
+    var newArr=newArrDivied(arr);
+    console.log(newArr);
+    while(true){
+    	console.log("我很帅")
+    }
+    </script>
+    </body>
+</html>

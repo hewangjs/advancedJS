@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+</head>
+<body>
+	<script>
+	//构造函数式创建对象
+	//特点：
+	//1、没有显式地创建对象
+	//2、直接将属性和方法赋给this对象
+	//3、没有return
+	function Person(name,age,job){
+		this.name=name;
+		this.age=age;
+		this.job=job;
+		this.sayName=function(){
+			console.log(this.name);
+		}
+	}
+	var person1=new Person("xiaoHong","19","student");
+	var person2=new Person("xiaoMing","30","tea");
+
+	//person1和person2都有一个constructor（构造函数属性），该属性指向Person
+	//属性的值是构造函数本身的引用，而不是包含函数名称的字符串
+	console.log(typeof person1.constructor);//function
+	console.log(person1.constructor);
+	console.log(typeof person2.constructor);//function
+	console.log(person2.constructor);
+	//javascript高级程序设计page148解释：constructor这个属性其实是在实例对象的原型对象中的
+    console.log(person1.__proto__);//左右各是两个下划线
+    console.log(person1.__proto__.constructor);
+
+	//这个例子中创建的所有对象既是Object的实例，同时也是Person的实例
+	console.log("instanceof");
+	console.log(person1 instanceof Person);//true
+	console.log(person1 instanceof Object);//true
+	console.log(person2 instanceof Person);//true
+	console.log(person2 instanceof Object);//true
+	//
+	console.log("使用构造函数的主要问题，就是每个方法都要在每个实例上重新创建一遍");
+	console.log(person1.sayName==person2.sayName);
+	</script>
+</body>
+</html>

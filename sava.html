@@ -1,0 +1,1083 @@
+<div ng-controller="sw_detailCtrl">
+	<div class="swDetailWrapper clearfix">
+		<div>
+			<div class="col-lg-8 panelLeft">
+				<div class="menu">
+					<div class="btn-group pull-left" role="group">
+						<!--<a type="button" class="btn btn-default btn-sm" ng-href="{{launchGuiUrl}}" ng-disabled="launch" target="_blank">
+							<span class="glyphicon glyphicon-globe"></span>
+			      			Launch GUI
+						</a>-->
+						<button type="button" class="btn btn-default btn-sm" ng-click="launchGui()" ng-disabled="noConnected">
+							<span class="glyphicon glyphicon-globe"></span>
+			      			Launch GUI
+						</button>
+						<!--<button type="button" class="btn btn-default btn-sm" ng-disabled="noConnected">
+							<span class="glyphicon glyphicon-console"></span>
+			      			Launch CLI
+						</button>-->
+						<button type="button" class="btn btn-default btn-sm" ng-disabled="true">
+							<span class="glyphicon glyphicon-console"></span>
+			      			Launch CLI
+						</button>
+						<div class="btn-group">
+							<button type="button" class="btn btn-default btn-sm dropdown-toggle" ng-disabled="noConnected" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+				      			Action
+				  			<span class="caret"></span>
+							</button>
+							<ul class="dropdown-menu">
+								<!--<li ng-repeat="con in action1" ng-if="swAction" ng-class="{'disabled': noConnected}">
+									<a>{{con}}</a>
+								</li>-->
+								<li ng-if="swAction" ng-class="{'disabled': isNotShut}" data-toggle="modal" data-target="#reloadWarningModal">
+									<a>Reload</a>
+								</li>
+								<!--<li ng-click="firmwareUpgrade()" ng-class="{'disabled': noConnected}">
+									<a>Firmware upgrade</a>
+								</li>-->
+								<li ng-click="firmwareUpgrade()" ng-if="swAction" ng-class="{'disabled': true}">
+									<a>Firmware upgrade</a>
+								</li>
+								<li ng-click="shutdown(isNotShut)" ng-if="intfaceAction" ng-class="{'disabled': isNotShut}">
+									<a>Shut down</a>
+								</li>
+								<li ng-click="noShutdown(isShut)" ng-if="intfaceAction" ng-class="{'disabled': isShut}">
+									<a>No-shut down</a>
+								</li>
+							</ul>
+						</div>
+					</div>
+					<div class="pull-left">
+						&nbsp;&nbsp;&nbsp;
+						<a href="javascript:;" class="swName" ng-bind="Data.basic.name"></a>&nbsp;&nbsp;&nbsp;
+						<span>Front-Panel View</span>&nbsp;&nbsp;
+						<!--|&nbsp;&nbsp;<a href="javascript:;">View</a>-->
+					</div>
+				</div>
+				<div class="viewPorts">
+					<table>
+						<tbody>
+							<tr>
+								<td ng-repeat="p in Data.portInfo" ng-if="p.num%2 == 1" ng-class="{'dark': p.flag}">
+									<span class="num">{{p.num}}</span>
+									<span class="port" ng-class="{'active': p.active, 'glyphicon glyphicon-flash': p.flash, 'isShutDown': p.isShutDown}" ng-click="toPort($index)"></span>
+								</td>
+							</tr>
+							<tr>
+								<td ng-repeat="p in Data.portInfo" ng-if="p.num%2 == 0" ng-class="{'dark': p.flag}">
+									<span class="num">{{p.num}}</span>
+									<span class="port" ng-class="{'active': p.active, 'glyphicon glyphicon-flash': p.flash, 'isShutDown': p.isShutDown}" ng-click="toPort($index)"></span>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+			<div class="col-lg-4 panelRight">
+				<div class="viewPanel">
+					<!--<p>Alarm :
+					<span ng-repeat="alarmnum in Data.alerts">
+						<a href="javascript:;" ng-if="alarmnum.num==0" class="bgColor-normal">{{alarmnum.num}}</a>
+						<a href="javascript:;" ng-if="alarmnum.status=='danger' && alarmnum.num!=0" class="bgColor-danger">{{alarmnum.num}}</a>
+						<a href="javascript:;" ng-if="alarmnum.status=='warning' && alarmnum.num!=0" class="bgColor-warning">{{alarmnum.num}}</a>
+						<a href="javascript:;" ng-if="alarmnum.status=='mind' && alarmnum.num!=0" class="bgColor-mind">{{alarmnum.num}}</a>
+					</span>
+					<button class="btn btn-primary btn-xs">View</button>
+				</p>-->
+					<p>Pid : <span ng-bind="Data.platform.pid"></span></p>
+					<p>Serial Number : <span ng-bind="Data.platform.serial_number"></span></p>
+					<p>MAC Address: <span ng-bind="Data.basic.mac"></span></p>
+					<p>Firmware : <span ng-bind="Data.platform.firmware_version"></span></p>
+					<p>Public IP : <span ng-bind="Data.pub_ip"></span></p>
+				</div>
+			</div>
+		</div>
+		<div class="col-lg-12">
+			<ul id="sysSetTab" class="nav nav-tabs">
+				<li ng-class="{'active': navTab == 1}" ng-click="changedTab(1,sw_text)">
+					<a href="#overview" data-toggle="tab">Overview</a>
+				</li>
+				<li ng-class="{'active': navTab == 2}" ng-click="changedTab(2,sw_text)">
+					<a href="#interfaces" data-toggle="tab">Interfaces</a>
+				</li>
+				<li ng-class="{'active': navTab == 3}" ng-click="changedTab(3,sw_text)">
+					<a href="#eventLog" data-toggle="tab">Event log</a>
+				</li>
+				<li ng-class="{'active': navTab == 4}" ng-click="changedTab(4,sw_text)" class="alertLogUnacked">
+					<a href="#alertLog" data-toggle="tab">Alert log</a>
+					<span class="alertLogUnackedTotal" ng-if="unAckedAlertLogs.length>0">
+						<span class="glyphicon glyphicon-warning-sign text-danger"></span>
+					</span>
+				</li>
+				<li ng-class="{'active': navTab == 5}" ng-click="changedTab(5,sw_text)">
+					<a href="#troubleShooting" data-toggle="tab">TroubleShooting</a>
+				</li>
+			</ul>
+			<div id="swTabContent" class="tab-content">
+				<div class="tab-pane panel-group fade" id="overview" ng-class="{'in': navTab == 1, 'active': navTab == 1}" style="margin-top: 10px;">
+					<div class="pull-left" style="width: 19%; margin-right: 5px;">
+						<div class="panel panel-default">
+							<div class="panel-heading">
+								<h4 class="panel-title">
+									<a data-toggle="collapse" data-parent="#overview" 
+									   href="#collapseOne">
+										 <span class="glyphicon glyphicon-chevron-up collapseIcon"></span>
+									</a>
+									&nbsp;Basic Info &nbsp;&nbsp;<span class="editIcon" data-toggle="modal" data-target="#BasicInfoModal">Edit</span>
+								</h4>
+							</div>
+							<div id="collapseOne" class="panel-collapse collapse">
+								<div class="panel-body">
+									<table class="text-left">
+										<tbody>
+											<tr>
+												<td>Hostname : <span ng-bind="Data.basic.name"></span></td>
+											</tr>
+											<tr>
+												<td>Type : <span ng-bind="Data.lan_ip.ip_type"></span></td>
+											</tr>
+											<tr>
+												<td>VLAN : <span ng-bind="Data.lan_ip.vlan_id"></span></td>
+											</tr>
+											<tr>
+												<td>Subnet mask : <span ng-bind="Data.lan_ip.mask"></span></td>
+											</tr>
+											<tr>
+												<td>DNS Server1 : <span ng-bind="Data.lan_ip.dns1"></span></td>
+											</tr>
+											<tr>
+												<td>DNS Server2 : <span ng-bind="Data.lan_ip.dns2"></span></td>
+											</tr>
+											<tr>
+												<td>IP : <span ng-bind="Data.lan_ip.ip"></span></td>
+											</tr>
+											<tr>
+												<td>LAN IPv6 : <span ng-bind="Data.localipv6address"></span></td>
+											</tr>
+											<tr>
+												<td>Public IP : <span ng-bind="Data.pub_ip"></span></td>
+											</tr>
+											<tr>
+												<td>Default Gateway : <span ng-bind="Data.lan_ip.gateway"></span></td>
+											</tr>
+											<tr>
+												<td>Tags :
+													<span ng-repeat="tag in Data.tag_list">
+														<span class="label label-info">{{tag}}</span>
+													</span>
+												</td>
+											</tr>
+											<tr>
+												<td>Notes : <span ng-bind="Data.notes"></span></td>
+											</tr>
+										</tbody>
+									</table>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="pull-right" style="width: 80%; margin-left: 5px;">
+
+						<!--Historical Data--> 
+						<div class="panel panel-default">
+							<div class="panel-heading">
+								<h4 class="panel-title">
+									<a data-toggle="collapse" data-parent="#overview" 
+									   href="#collapseTwo">
+										 <span class="glyphicon glyphicon-chevron-up collapseIcon"></span>
+									</a>
+									&nbsp;Historical Data 
+									<div class="btn-group" role="group">
+										<button type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+							      			<i>{{sw_text}}</i>
+							      			<span class="caret"></span>
+							    		</button>
+						                <ul class="dropdown-menu" aria-labelledby="dropdownMenu">
+						                    <li ng-repeat = "timeModel in timeList">
+						                        <a ng-click="selectedTime(timeModel)">{{timeModel}}</a>
+						                    </li>
+						                </ul>
+									</div>
+								</h4>
+							</div>
+							<div id="collapseTwo" class="panel-collapse collapse">
+								<div class="panel-body" id="historyDataDiv">
+									<div class="connectivity center-block">
+										<p><strong>Connectivity</strong></p>
+										<div class="progress">
+											<div ng-repeat="con in Data.connectivity">
+												<div ng-if="con.status=='no data'" class="progress-bar progress_bar_nodata" role="progressbar" style="width:{{con.percent}}%;" title="{{con.description }} ">
+												</div>
+												<div ng-if="con.status=='on'" class="progress-bar progress_bar_connect" style="width:{{con.percent}}%;height: 20px;" title="{{con.description}}">
+													<span class="sr-only">
+														{{con.percent}}
+													</span>
+												</div>
+												<div ng-if="con.status=='off'" class="progress-bar progress_bar_noconnect" style="width:{{con.percent}}%;height: 20px;" title="{{con.description}}">
+													<span class="sr-only">
+														{{con.percent}}
+													</span>
+												</div>
+											</div>
+										</div>
+									</div>
+									<hr style="margin-top: 0;"/>
+									<!--<div id="ThroughPut" class="center-block" style="width: 600px;height:340px;">-->
+									<p style="width: 70%;margin: 0 auto;"><strong>Switch traffic data</strong></p>
+									<div id="devThroughput" style="height:230px;margin: 0 auto;"></div>
+									<h4 ng-if="noData" class="text-center" style="width:100%;height:50px;line-height:50px;position:relative;top:-172px;">No enough data to show</h4>
+									<!--</div>-->
+									<hr style="margin-top: 0;"/>
+								</div>
+							</div>
+						</div>
+
+						<!--Device Health-->
+						<div class="panel panel-default">
+							<div class="panel-heading">
+								<h4 class="panel-title">
+									<a data-toggle="collapse" data-parent="#overview" 
+									   href="#deviceHealth">
+										 <span class="glyphicon glyphicon-chevron-up collapseIcon"></span>
+									</a>
+									&nbsp;Device Health
+									<div class="btn-group" role="group">
+										<button type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+							      			<i>{{defaultTimeModel}}</i>
+							      			<span class="caret"></span>
+							    		</button>
+						                <ul class="dropdown-menu" aria-labelledby="dropdownMenu">
+						                    <li ng-repeat = "timeModel in timeList">
+						                        <a ng-click="selectedDeviceTime(timeModel)">{{timeModel}}</a>
+						                    </li>
+						                </ul>
+									</div>
+									
+								</h4>
+							</div>
+							<div id="deviceHealth" class="panel-collapse collapse">
+								<div class="panel-body" id="deviceTemperatureParent">
+									<div class="connectivity center-block">
+										<p><strong>Fan</strong></p>
+										<div class="progress">
+											<div ng-repeat="con in fanConData">
+												<!--1 no data-->
+												<div ng-if="con.conStatus=='no data'" class="progress-bar progress_bar_nodata" role="progressbar" style="width:{{con.percent}}%;" title="{{con.description }} ">
+												</div>
+												<!--2 ok-->
+												<div ng-if="con.conStatus=='ok'" class="progress-bar progress_bar_connect" style="width:{{con.percent}}%;height: 20px;" title="{{con.description}}">
+													<span class="sr-only">
+														{{con.percent}}
+													</span>
+												</div>
+												<!--3 faulty-->
+												<div ng-if="con.conStatus=='faulty'" class="progress-bar progress_bar_noconnect" style="width:{{con.percent}}%;height: 20px;" title="{{con.description}}">
+													<span class="sr-only">
+														{{con.percent}}
+													</span>
+												</div>
+												<!--4 not_powered-->
+												<div ng-if="con.conStatus=='not_powered'" class="progress-bar" style="width:{{con.percent}}%;height: 20px;background-color:#FFC107;" title="{{con.description}}">
+													<span class="sr-only">
+														{{con.percent}}
+													</span>
+												</div>
+												<!--5 not_present-->
+												<div ng-if="con.conStatus=='not_present'" class="progress-bar" style="width:{{con.percent}}%;height: 20px;background-color:# FFC107;" title="{{con.description}}">
+													<span class="sr-only">
+														{{con.percent}}
+													</span>
+												</div>
+												<!--6 invalid-->
+												<div ng-if="con.conStatus=='invalid'" class="progress-bar" style="width:{{con.percent}}%;height: 20px;background-color:#607D8B;" title="{{con.description}}">
+													<span class="sr-only">
+														{{con.percent}}
+													</span>
+												</div>
+												
+											</div>
+										</div>
+									</div>
+									<hr />
+									<div id="deviceTemperature" style="height:230px;margin: 0 auto;"></div>
+									<hr />
+									<div id="devicePower" style="height:230px;margin: 0 auto;">Device Power</div>
+								</div>
+							</div>
+						</div>
+
+						<!--Clients-->						
+						<div class="panel panel-default">
+							<div class="panel-heading">
+								<h4 class="panel-title">
+									<a data-toggle="collapse" data-parent="#overview" 
+									   href="#collapseClients">
+										 <span class="glyphicon glyphicon-chevron-up collapseIcon"></span>
+									</a>
+									&nbsp;Clients
+								</h4>
+							</div>
+							<div id="collapseClients" class="panel-collapse collapse">
+								<div class="panel-body">
+									<div class="clients center-block">
+										<table class="table_diy">
+											<caption>Clients</caption>
+											<thead>
+												<tr>
+													<th>No.</th>
+													<th>Client name</th>
+													<th>MAC address</th>
+													<th>IP address</th>
+													<th>VLAN</th>
+													<th>Port</th>
+												</tr>
+											</thead>
+											<tbody>
+												<tr ng-repeat="item in clients" ng-class-even="'org-even'" ng-class-odd="'org-odd'">
+													<td>{{item.No}}</td>
+													<td>{{item.Name}}</td>
+													<td>{{item.MAC_address}}</td>
+													<td>{{item.IP_address}}</td>
+													<td>{{item.VLAN}}</td>
+													<td>{{item.Port}}</td>
+												</tr>
+											</tbody>
+										</table>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="tab-pane panel-group fade" id="interfaces" ng-class="{'in': navTab == 2, 'active': navTab == 2}" style="margin-top: 10px;">
+					<table class="table_diy" ng-show="!isPort">
+						<thead>
+							<tr>
+								<th>Interface</th>
+								<th>Name</th>
+								<th>Status</th>
+								<th>Mode</th>
+								<th>VLAN</th>
+								<th>Allowed VLANs</th>
+								<th>STP state</th>
+								<th>PoE</th>
+								<th>Input traffic</th>
+								<th>Output traffic</th>
+								<!--<th>admin_state</th>-->
+							</tr>
+						</thead>
+						<tbody>
+							<tr ng-repeat="row in Data.interface_list" ng-click="toPort($index)">
+								<td>{{row.port_num}}</td>
+								<td>{{row.name}}</td>
+								<td>{{row.status.link_status}}</td>
+								<td>{{row.switch_cfg.port_mode}}</td>
+								<td>
+									<span ng-if="row.switch_cfg.port_mode == 'access'">{{row.switch_cfg.access_vlan}}</span>
+									<span ng-if="row.switch_cfg.port_mode == 'trunk'">{{row.switch_cfg.native_vlan}}</span>
+								</td>
+								<td>{{row.switch_cfg.allowed_vlan_list}}</td>
+								<td>{{row.RSTP}}</td>
+								<td>
+									<span ng-if="row.switch_cfg.poe_mode=='invalid'">unsupported</span>
+									<span ng-if="row.switch_cfg.poe_mode=='off'">disabled</span>
+									<span ng-if="row.switch_cfg.poe_mode=='auto'">enabled</span>
+								</td>
+								<td>{{row.input}}</td>
+								<td>{{row.output}}</td>
+								<!--<td>{{row.admin_state}}</td>-->
+							</tr>
+						</tbody>
+					</table>
+					<div ng-show="isPort">
+						<div class="panel panel-default">
+							<div class="panel-heading">
+								<h4 class="panel-title">
+									<a data-toggle="collapse" data-parent="#interfaces" 
+									   href="#collapseThree" ng-click="changeIcon(1)">
+										 <span class="glyphicon glyphicon-chevron-up collapseIcon" ng-class="{'glyphicon-chevron-down':collapseDown1}"></span>
+									</a>
+									&nbsp;Interface 
+									&nbsp;&nbsp;<button class="btn btn-xs btn-default" ng-click="returnToList()" style="margin-top: -6px;"><span class="glyphicon glyphicon-list" style="top: 2px;"></span></button>
+									&nbsp;&nbsp;&nbsp;&nbsp;<span class="highlightColor">{{getPort.name}}</span>
+									&nbsp;&nbsp;<span class="editIcon" data-toggle="modal" data-target="#InterfaceModal" ng-click="getInterfaceModel()">Edit</span>&nbsp;&nbsp;
+									
+								</h4>
+							</div>
+							<div id="collapseThree" class="panel-collapse collapse">
+								<div class="panel-body">
+									<table class="text-left">
+										<tbody>
+											<tr>
+												<!--<td>Link configuration : <span>{{getPort.speed}} {{getPort.duplex}} duplex</span></td>-->
+												<td>Speed : <span ng-bind="getPort.speed"></span></td>
+												<td>Duplex : <span ng-bind="getPort.duplex"></span></td>
+												<td>Mode : <span ng-bind="getPort.switch_cfg.port_mode"></span></td>
+											</tr>
+											<tr>
+												<td>VLAN : <span ng-show="getPort.switch_cfg.port_mode == 'access'" ng-bind="getPort.switch_cfg.access_vlan"></span><span ng-show="getPort.switch_cfg.port_mode == 'trunk'" ng-bind="getPort.switch_cfg.native_vlan"></span></td>
+												<td ng-show="getPort.switch_cfg.port_mode == 'trunk'">Allowed VLANs : <span ng-bind="getPort.switch_cfg.allowed_vlan_list"></span></td>
+												<td ng-show="getPort.switch_cfg.port_mode == 'access'">Voice VLAN : <span ng-bind="getPort.switch_cfg.voice_vlan"></span></td>
+												<td>Spanning tree state : forwarding</td>
+											</tr>
+											<tr>
+												<td>Tags :
+													<span class="label label-info tag" ng-repeat="tag in getPort.tag_list" ng-bind="tag"></span>
+												</td>
+												<td>Notes : None</td>
+											</tr>
+										</tbody>
+									</table>
+								</div>
+							</div>
+						</div>
+						<div class="panel panel-default">
+							<div class="panel-heading">
+								<h4 class="panel-title">
+									<a data-toggle="collapse" data-parent="#interfaces" 
+									   href="#collapseFour" ng-click="changeIcon(2)">
+										 <span class="glyphicon glyphicon-chevron-up collapseIcon" ng-class="{'glyphicon-chevron-down':collapseDown2}"></span>
+									</a>
+									&nbsp;Historical Data 
+									<div class="btn-group" role="group">
+										<button type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+							      			<i>{{sw_text2}}</i>
+							      			<span class="caret"></span>
+							    			</button>
+						                <ul class="dropdown-menu" aria-labelledby="dropdownMenu">
+						                    <li ng-repeat = "timeModel in timeList">
+						                        <a ng-click="selectedTime2(timeModel)">{{timeModel}}</a>
+						                    </li>
+						                </ul>
+									</div>
+								</h4>
+							</div>
+							<div id="collapseFour" class="panel-collapse collapse">
+								<div class="panel-body" id="historyPortDataDiv">
+									<div class="connectivity center-block">
+										<p><strong>Connectivity</strong></p>
+										<div class="progress">
+											<div ng-repeat="con in testData.connectivity">
+												<div ng-if="con.status=='no data'" class="progress-bar progress_bar_nodata" role="progressbar" style="width:{{con.percent}}%;" title="{{con.description }} ">
+												</div>
+												<div ng-if="con.status=='on'" class="progress-bar progress_bar_connect" style="width:{{con.percent}}%;height: 20px;" title="{{con.description}}">
+													<span class="sr-only">
+														{{con.percent}}
+													</span>
+												</div>
+												<div ng-if="con.status=='off'" class="progress-bar progress_bar_noconnect" style="width:{{con.percent}}%;height: 20px;" title="{{con.description}}">
+													<span class="sr-only">
+														{{con.percent}}
+													</span>
+												</div>
+											</div>
+										</div>
+										<!--<div class="time col-xs-12 text-center">
+											<div class="col-xs-2">20:00</div>
+											<div class="col-xs-2">00:00</div>
+											<div class="col-xs-2">04:00</div>
+											<div class="col-xs-2">08:00</div>
+											<div class="col-xs-2">12:00</div>
+											<div class="col-xs-2">16:00</div>
+										</div>-->
+									</div>
+									<hr />
+									<!--<echart-el id="main2" legends="legends" items="items" datas="datas"></echart-el>-->
+									<p style="width: 70%;margin: 0 auto;"><strong>Port traffic data</strong></p>
+									<div id="portThroughput" style="height:230px;margin: 0 auto;"></div>
+									<!--<echart-eldt style="width: 70%;margin: 0 auto;" id="maindt" legendsdt="legendsdt" itemsdt="itemsdt" datasdt="datasdt" accessordt="accessordt"></echart-eldt>-->
+									<h4 ng-if="noData2" class="text-center" style="width:100%;height:50px;line-height:50px;position:relative;top:-172px;">No enough data to show</h4>
+									<hr />
+									<div class="clients center-block">
+										<table class="table_diy">
+											<caption>Port Packets Statistics</caption>
+											<thead>
+												<tr>
+													<th></th>
+													<th>Total</th>
+													<th>Received</th>
+													<th>Sent</th>
+												</tr>
+											</thead>
+											<tbody>
+												<tr ng-repeat="item in portPackets.data" ng-class-even="'org-even'" ng-class-odd="'org-odd'">
+													<td>{{portPackets.menu[$index]}}</td>
+													<td>{{item.received+item.sent}}</td>
+													<td>{{item.received}}</td>
+													<td>{{item.sent}}</td>
+												</tr>
+											</tbody>
+										</table>
+									</div>
+								</div>
+							</div>
+						</div>
+
+					</div>
+				</div>
+				<div class="tab-pane panel-group fade" id="eventLog" ng-class="{'in': navTab == 3, 'active': navTab == 3}">
+					<div class="eventLog">
+						<table class="table_diy">
+							<thead>
+								<tr>
+									<!--<th><input type="checkbox" ng-model="select_all2" ng-change="selectAll2()"/></th>-->
+									<th ng-click="sortBy('Logtime2')" class="text-left">
+										Logtime
+										<span class="sortorder" ng-show="propertyName === 'Logtime2'" ng-class="{reverse: reverse}"></span>
+									</th>
+									<th ng-click="sortBy('Severity2')" class="text-left">
+										Severity
+										<span class="sortorder" ng-show="propertyName === 'Severity2'" ng-class="{reverse: reverse}"></span>
+									</th>
+									<th ng-click="sortBy('Device2')" class="text-left">
+										Device
+										<span class="sortorder" ng-show="propertyName === 'Device2'" ng-class="{reverse: reverse}"></span>
+									</th>
+									<th ng-click="sortBy('Facility2')" class="text-left">
+										Facility
+										<span class="sortorder" ng-show="propertyName === 'Facility2'" ng-class="{reverse: reverse}"></span>
+									</th>
+									<th ng-click="sortBy('Event_type2')" class="text-left">
+										Event-type
+										<span class="sortorder" ng-show="propertyName === 'Event_type2'" ng-class="{reverse: reverse}"></span>
+									</th>
+									<th ng-click="sortBy('Details2')" class="text-left">
+										Details
+										<span class="sortorder" ng-show="propertyName === 'Details2'" ng-class="{reverse: reverse}"></span>
+									</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr ng-repeat="item in eventLogs | orderBy:propertyName:reverse" ">
+									<!--<td><input type="checkbox " ng-model="item.checked " ng-change="selectOne2() "/></td>-->
+									<td>{{item.log.timestamp | covertUTCToLoal}}</td>
+									<td>
+										<span ng-if="item.log.sev=='0' " title="Emergencies ">Emergencies</span>
+										<span ng-if="item.log.sev=='1' " title="Alerts ">Alerts</span>
+										<span ng-if="item.log.sev=='2' " title="Critical ">Critical</span>
+										<span ng-if="item.log.sev=='3' " title="Errors ">Errors</span>
+										<span ng-if="item.log.sev=='4' " title="Warnings ">Warnings</span>
+										<span ng-if="item.log.sev=='5' " title="Notifications ">Notifications</span>
+										<span ng-if="item.log.sev=='6' " title="Informational ">Informational</span>
+										<span ng-if="item.log.sev=='7' " title="Debugging ">Debugging</span>
+									</td>
+									<td>{{item.dev_name}}<br/>{{item.platform.serial_number}}<br/>{{item.platform.pid}}</td>
+									<td>{{item.log.module}}</td>
+									<td>{{item.log.event}}</td>
+									<td style="max-width:300px; ">{{item.log.message}}</td>
+								</tr>
+							</tbody>
+						</table>
+						<div ng-if="eventLogs.length==0 ">
+							<p class="text-center ">
+								<strong>There is no matching result.</strong>
+							</p>
+						</div>
+					</div>
+				</div>
+				<div class="tab-pane panel-group fade " id="alertLog " ng-class="{ 'in': navTab==4 , 'active': navTab==4 } ">
+					<div class="alertLog ">
+						<table class="table_diy ">
+							<thead>
+								<tr>
+									<!--<th><input type="checkbox " ng-model="select_all1 " ng-change="selectAll1() "/></th>-->
+									<th ng-click="sortBy( 'Logtime1') " class="text-left ">
+										Logtime
+										<span class="sortorder " ng-show="propertyName==='Logtime1' " ng-class="{reverse: reverse} "></span>
+									</th>
+									<th ng-click="sortBy( 'Severity') " class="text-left ">
+										Severity
+										<span class="sortorder " ng-show="propertyName==='Severity' " ng-class="{reverse: reverse} "></span>
+									</th>
+									<th ng-click="sortBy( 'Device') " class="text-left ">
+										Device
+										<span class="sortorder " ng-show="propertyName==='Device' " ng-class="{reverse: reverse} "></span>
+									</th>
+									<th ng-click="sortBy( 'Event_type') " class="text-left ">
+										Event-type
+										<span class="sortorder " ng-show="propertyName==='Event_type' " ng-class="{reverse: reverse} "></span>
+									</th>
+									<th ng-click="sortBy( 'Status') " class="text-left ">
+										Status
+										<span class="sortorder " ng-show="propertyName==='Status' " ng-class="{reverse: reverse} "></span>
+									</th>
+									<th ng-click="sortBy( 'Details') " class="text-left ">
+										Details
+										<span class="sortorder " ng-show="propertyName==='Details' " ng-class="{reverse: reverse} "></span>
+									</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr ng-repeat="item in unAckedAlertLogs | orderBy:propertyName:reverse ">
+									<!--<td><input type="checkbox " ng-model="item.checked " ng-change="selectOne1($index) "/></td>-->
+									<td>{{item.alert.timestamp | covertUTCToLoal}}</td>
+									<td>
+										<span ng-if="item.alert.sev=='0' " title="Emergencies ">Emergencies</span>
+										<span ng-if="item.alert.sev=='1' " title="Alerts ">Alerts</span>
+										<span ng-if="item.alert.sev=='2' " title="Critical ">Critical</span>
+										<span ng-if="item.alert.sev=='3' " title="Errors ">Errors</span>
+										<span ng-if="item.alert.sev=='4' " title="Warnings ">Warnings</span>
+										<span ng-if="item.alert.sev=='5' " title="Notifications ">Notifications</span>
+										<span ng-if="item.alert.sev=='6' " title="Informational ">Informational</span>
+										<span ng-if="item.alert.sev=='7' " title="Debugging ">Debugging</span>
+									</td>
+									<td>{{item.dev_name}}<br/>{{item.platform.serial_number}}<br/>{{item.platform.pid}}</td>
+									<td>{{item.alert.event}}</td>
+									<td>{{item.status}}</td>
+									<td style="max-width:300px; ">{{item.alert.message}}</td>
+								</tr>
+							</tbody>
+						</table>
+						<div ng-if="unAckedAlertLogs.length==0 ">
+							<p class="text-center ">
+								<strong>There is no matching result.</strong>
+							</p>
+						</div>
+					</div>
+				</div>
+				<div class="tab-pane panel-group fade " id="troubleShooting " ng-class="{ 'in': navTab==5 , 'active': navTab==5 } ">
+					<h4 style="margin: 50px; color: red; ">
+						<img src="images/under-construction.jpg " style="width: 40px;height: 40px; " />
+						Under construction!
+					</h4>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!--Basic Info Modal -->
+	<div class="modal fade " id="BasicInfoModal " tabindex="-1 " role="dialog " aria-labelledby="BasicInfoModalLabel " data-backdrop="static " data-keyboard="false ">
+		<div class="modal-dialog " role="document ">
+			<div class="modal-content " >
+				<div class="modal-header ">
+					<button type="button " class="close " data-dismiss="modal " aria-label="Close "><span aria-hidden="true ">&times;</span></button>
+					<h4 class="modal-title " id="BasicInfoModalLabel ">Configure Switch</h4>
+				</div>
+				<div class="modal-body " style="height: 400px; overflow-x: hidden; overflow-y: auto; ">
+					<form class="form-horizontal ">
+						<div class="form-group ">
+							<label for=" " class="col-sm-5 col-lg-5 control-label ">Hostname :</label>
+							<div class="col-sm-4 col-lg-4 ">
+								<input type="text " class="form-control " ng-model="modalData.basic.name " />
+							</div>
+						</div>
+						<div class="form-group ">
+							<label for=" " class="col-sm-5 col-lg-5 control-label ">Type :</label>
+							<div class="col-sm-6 col-lg-6 ">
+								<label class="radio-inline ">
+									<input type="radio " name="inlineRadioOptions " id="inlineRadio1 " value="option1 " ng-model="modalData.lan_ip.ip_type " ng-checked="modalData.lan_ip.ip_type=='static' " ng-click="StIP() ">Static IP
+								</label>
+								<label class="radio-inline ">
+									<input type="radio " name="inlineRadioOptions " id="inlineRadio2 " value="option2 " ng-model="modalData.lan_ip.ip_type " ng-checked="modalData.lan_ip.ip_type=='dhcp' " ng-click="DHCP() ">DHCP
+								</label>
+							</div>
+						</div>
+						<div class="form-group ">
+							<label for=" " class="col-sm-5 col-lg-5 control-label ">IP :</label>
+							<div class="col-sm-4 col-lg-4 ">
+								<input type="text " class="form-control " ng-model="modalData.lan_ip.ip " ng-readonly="mark "/>
+							</div>
+						</div>
+						<div class="form-group ">
+							<label for=" " class="col-sm-5 col-lg-5 control-label ">VLAN :</label>
+							<div class="col-sm-4 col-lg-4 ">
+								<input type="text " class="form-control " ng-model="modalData.lan_ip.vlan_id " />
+							</div>
+						</div>
+						<div class="form-group ">
+							<label for=" " class="col-sm-5 col-lg-5 control-label ">Subnet mask :</label>
+							<div class="col-sm-4 col-lg-4 ">
+								<input type="text " class="form-control " ng-model="modalData.lan_ip.mask " ng-readonly="mark "/>
+							</div>
+						</div>
+						<div class="form-group ">
+							<label for=" " class="col-sm-5 col-lg-5 control-label ">Default Gateway :</label>
+							<div class="col-sm-4 col-lg-4 ">
+								<input type="text " class="form-control " ng-model="modalData.lan_ip.gateway " ng-readonly="mark "/>
+							</div>
+						</div>
+						<div class="form-group ">
+							<label for=" " class="col-sm-5 col-lg-5 control-label ">DNS Server1 :</label>
+							<div class="col-sm-4 col-lg-4 ">
+								<input type="text " class="form-control " ng-model="modalData.lan_ip.dns1 " ng-readonly="mark "/>
+							</div>
+						</div>
+						<div class="form-group ">
+							<label for=" " class="col-sm-5 col-lg-5 control-label ">DNS Server2 :</label>
+							<div class="col-sm-4 col-lg-4 ">
+								<input type="text " class="form-control " ng-model="modalData.lan_ip.dns2 " ng-readonly="mark "/>
+							</div>
+						</div>
+						<!--<div class="form-group ">
+							<label for=" " class="col-sm-5 col-lg-5 control-label ">Location :</label>
+							<div class="col-sm-4 col-lg-4 ">
+								<input type="text " class="form-control " ng-model="modalData.location " />
+							</div>
+						</div>-->
+						<div class="form-group ">
+							<label for=" " class="col-sm-5 col-lg-5 control-label ">Tags :</label>
+							<ul class="col-sm-4 col-lg-4 tags ">
+								<li ng-repeat="tag in modalData.tag_list " class="pull-left ">
+									<span class="label label-info ">{{tag}}  <span ng-click="deleteSwitchTag($index) ">&times;</span></span>
+								</li>
+								<span class="glyphicon " ng-class="{ 'glyphicon-plus':isTag, 'glyphicon-minus':!isTag} " ng-click="tagCtrl() "></span>
+								<li ng-class="{ 'hide': isTag, 'show': !isTag} ">
+									<input type="text " class="form-control " ng-model="newTag " /><span class="glyphicon glyphicon-ok " ng-click="addSwitchTag(newTag) "></span>
+								</li>
+							</ul>
+						</div>
+						<div class="form-group ">
+							<label for=" " class="col-sm-5 col-lg-5 control-label ">Notes :</label>
+							<div class="col-sm-4 col-lg-4 ">
+								<input type="text " class="form-control " ng-model="modalData.notes " />
+							</div>
+						</div>
+					</form>
+				</div>
+				<div class="modal-footer ">
+					<button type="button " class="btn btn-sm btn-default " data-dismiss="modal " ng-click="cancelBasicInfo() ">Cancel</button>
+					<button type="button " class="btn btn-sm btn-primary " ng-click="editBasicInfo(modalData) " ng-disabled="btnGray ">Save</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!--Interface Modal -->
+	<div class="modal fade " id="InterfaceModal " tabindex="-1 " role="dialog " aria-labelledby="InterfaceModalLabel " data-backdrop="static " data-keyboard="false ">
+		<div class="modal-dialog " role="document ">
+			<div class="modal-content ">
+				<div class="modal-header ">
+					<button type="button " class="close " data-dismiss="modal " aria-label="Close "><span aria-hidden="true ">&times;</span></button>
+					<h4 class="modal-title " id="InterfaceModalLabel ">Interface</h4>
+				</div>
+				<div class="modal-body ">
+					<form class="form-horizontal ">
+						<!--<div class="form-group ">
+							<label for=" " class="col-sm-5 col-lg-5 control-label ">Link configuration :</label>
+							<div class="col-sm-4 col-lg-4 ">
+								<select class="form-control " name="LinkSelect " id="LinkSelect ">
+									<option selected="selected ">Auto negotiate</option>
+									<option>1 Gigabit full duplex</option>
+									<option>100 Megabit</option>
+									<option>100 Megabit full duplex</option>
+									<option>100 Megabit half duplex</option>
+									<option>10 Megabit</option>
+									<option>10 Megabit full duplex</option>
+									<option>10 Megabit half duplex</option>
+								</select>
+							</div>
+						</div>-->
+						<div class="form-group ">
+							<label for=" " class="col-sm-5 col-lg-5 control-label ">Speed :</label>
+							<div class="col-sm-4 col-lg-4 ">
+								<select class="form-control " name="speed " id="speed " ng-model="getPortModal.speed " ng-change="changeSpeed(getPortModal.speed) ">
+									<option selected="selected ">auto</option>
+									<option>10Gbps</option>
+									<option>1000Mbps</option>
+									<option>100Mbps</option>
+									<option>10Mbps</option>
+								</select>
+							</div>
+						</div>
+						<div class="form-group ">
+							<label for=" " class="col-sm-5 col-lg-5 control-label ">Duplex :</label>
+							<div class="col-sm-4 col-lg-4 ">
+								<select class="form-control " name="duplex " id="duplex " ng-model="getPortModal.duplex " ng-click="changeDuplex() ">
+									<option ng-disabled="disSelected " selected="selected ">auto</option>
+									<option>full</option>
+									<option ng-disabled="disSelected ">half</option>
+								</select>
+							</div>
+						</div>
+						<div class="form-group ">
+							<label for=" " class="col-sm-5 col-lg-5 control-label ">Mode :</label>
+							<div class="col-sm-4 col-lg-4 ">
+								<select class="form-control " name="ModeSelect " id="ModeSelect " ng-model="getPortModal.switch_cfg.port_mode " required>
+									<option ng-selected="getPortModal.switch_cfg.port_mode=='access' " value="access ">access</option>
+									<option ng-selected="getPortModal.switch_cfg.port_mode=='trunk' " value="trunk ">trunk</option>
+								</select>
+							</div>
+						</div>
+						<div class="form-group " ng-show="getPortModal.switch_cfg.port_mode=='dynamic auto' ">
+							<label for=" " class="col-sm-5 col-lg-5 control-label ">VLAN :</label>
+							<div class="col-sm-4 col-lg-4 ">
+								<input type="number " class="form-control " ng-model="getPortModal.switch_cfg.vlan "/>
+							</div>
+						</div>
+						<div class="form-group " ng-show="getPortModal.switch_cfg.port_mode=='access' ">
+							<label for=" " class="col-sm-5 col-lg-5 control-label ">VLAN :</label>
+							<div class="col-sm-4 col-lg-4 ">
+								<input type="number " class="form-control " ng-model="getPortModal.switch_cfg.access_vlan "/>
+							</div>
+						</div>
+						<div class="form-group " ng-show="getPortModal.switch_cfg.port_mode=='trunk' ">
+							<label for=" " class="col-sm-5 col-lg-5 control-label ">VLAN :</label>
+							<div class="col-sm-4 col-lg-4 ">
+								<input type="number " class="form-control " ng-model="getPortModal.switch_cfg.native_vlan "/>
+							</div>
+						</div>
+						<div class="form-group ">
+							<label for=" " class="col-sm-5 col-lg-5 control-label ">Voice VLAN :</label>
+							<div class="col-sm-4 col-lg-4 ">
+								<input type="number " class="form-control " ng-readonly="getPortModal.switch_cfg.port_mode=='trunk' " ng-model="getPortModal.switch_cfg.voice_vlan "/>
+							</div>
+						</div>
+						<div class="form-group ">
+							<label for=" " class="col-sm-5 col-lg-5 control-label ">Allowed VLANs :</label>
+							<div class="col-sm-4 col-lg-4 ">
+								<input type="text " class="form-control " ng-readonly="getPortModal.switch_cfg.port_mode=='access' " ng-model="getPortModal.switch_cfg.allowed_vlan_list "/>
+							</div>
+						</div>
+						<div class="form-group ">
+							<label for=" " class="col-sm-5 col-lg-5 control-label ">POE :</label>
+							<div class="col-sm-4 col-lg-4 ">
+								<select class="form-control " name="POESelect " id="POESelect " ng-disabled="isPOE ">
+									<option value="auto ">auto</option>
+									<option value="disable ">disable</option>
+								</select>
+							</div>
+						</div>
+						<div class="form-group ">
+							<label for=" " class="col-sm-5 col-lg-5 control-label ">Tags :</label>
+							<ul class="col-sm-4 col-lg-4 tags ">
+								<li ng-repeat="tag in getPortModal.tag_list " class="pull-left ">
+									<span class="label label-info ">{{tag}}  <span ng-click="deletePortTag($index) ">&times;</span></span>
+								</li>
+								<span class="glyphicon " ng-class="{ 'glyphicon-plus':isTag, 'glyphicon-minus':!isTag} " ng-click="tagCtrl() "></span>
+								<li ng-class="{ 'hide': isTag, 'show': !isTag} ">
+									<input type="text " class="form-control " ng-model="newTag " /><span class="glyphicon glyphicon-ok " ng-click="addPortTag(newTag) "></span>
+								</li>
+							</ul>
+						</div>
+						<div class="form-group ">
+							<label for=" " class="col-sm-5 col-lg-5 control-label ">Notes :</label>
+							<div class="col-sm-4 col-lg-4 ">
+								<input type="text " class="form-control "/>
+							</div>
+						</div>
+					</form>
+				</div>
+				<div class="modal-footer ">
+					<button type="button " class="btn btn-sm btn-default " data-dismiss="modal ">Cancel</button>
+					<button type="button " class="btn btn-sm btn-primary " ng-click="editInterface(getPortModal) " ng-disabled="btnGray ">Save</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!--reload warning-->
+	<div class="modal fade " id="reloadWarningModal " tabindex="-1 " role="dialog " aria-labelledby="reloadWarningModal " data-backdrop="static " data-keyboard="false ">
+		<div class="modal-dialog " role="document ">
+			<div class="modal-content " >
+				<div class="modal-header ">
+					<button type="button " class="close " data-dismiss="modal " aria-label="Close "><span aria-hidden="true ">&times;</span></button>
+					<h5 class="modal-title text-danger " id="reloadWarningModalLabel ">Warning</h5>
+				</div>
+				<div class="modal-body ">
+					Do you really want to reload this switch?
+				</div>
+				<div class="modal-footer ">
+					<button type="button " class="btn btn-sm btn-default " data-dismiss="modal ">Cancel</button>
+					<button type="button " class="btn btn-sm btn-primary " ng-click="swReload() ">Save</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="goBack "></div>
+</div>
+
+<script>
+	$(function(){
+		
+		$('#collapseOne, #collapseTwo, #collapseThree, #collapseFour,#collapseClients,#deviceHealth').collapse('toggle');
+		$('#swTabContent h4 .collapseIcon').click(function() {
+			$(this).toggleClass('glyphicon-chevron-down')
+		})
+		
+		var swDetailfixedWidth = $(window).width()-200-40;
+		$('#sysSetTab').css('width', swDetailfixedWidth);
+		var navOffsetTop=$('#sysSetTab').offset().top;
+		$('.mainContainer').scroll(function(event) {
+//			console.log(navOffsetTop)
+			if($('.mainContainer').scrollTop()>=150){
+				$('#sysSetTab').addClass('navHasFixed');
+				$('#swTabContent').css('margin-top', 54);
+			}else{
+				$('#sysSetTab').removeClass('navHasFixed');
+				$('#swTabContent').css('margin-top', 0);
+			}
+		});
+	})
+	/*var myThroughPut = echarts.init(document.getElementById('ThroughPut'));
+	var timeData = ['02:00', '04:00', '06:00', '08:00', '10:00', '12:00', '14:00', '16:00', '18:00', '20:00', '22:00', '00:00']
+	myThroughPut.setOption({
+		tooltip: {
+			trigger: 'axis',
+			axisPointer: {
+				animation: false
+			},
+			formatter: '{c}Kb/s'
+		},
+		legend: {
+			x: 'left',
+			data: ['counts']
+		},
+		axisPointer: {
+			link: {
+				xAxisIndex: 'all'
+			}
+		},
+		grid: [{
+			left: 50,
+			right: 50,
+			height: '60%'
+		}, {
+			left: 50,
+			right: 50,
+			top: '-100',
+			height: '0'
+		}],
+		xAxis: [{
+				type: 'category',
+				boundaryGap: false,
+				axisLine: {
+					onZero: true
+				},
+				data: timeData,
+				axisLabel: {
+					interval: 1
+				}
+			},
+			{
+				gridIndex: 1,
+				type: 'category',
+				boundaryGap: false,
+				axisLine: {
+					onZero: true,
+					lineStyle: {
+						opacity: 0
+					}
+				},
+				//data: timeData,
+				position: 'top'
+			}
+		],
+		yAxis: [{
+				name: 'ThroughPut',
+				type: 'value',
+				//max : 24
+				nameTextStyle: {
+					fontWeight: 'bold',
+					fontSize: 14,
+					color: '#555'
+				},
+				axisLabel: {
+					formatter: '{value}Kb/s'
+				},
+				splitNumber: 5
+			},
+			{
+				gridIndex: 1,
+				name: '',
+				type: 'value',
+				inverse: true
+			}
+		],
+		series: [{
+			name: 'Clients Count',
+			type: 'line',
+			symbolSize: 8,
+			hoverAnimation: false,
+			data: [
+				20.2, 28.1, 12.8, 20.1, 12.9, 10.6, 13.4, 12.6, 20.7, 17.8, 15.6, 15.7
+			]
+		}]
+	})*/
+
+	/*var PortTraffic = echarts.init(document.getElementById('PortTraffic'));
+	var timeData = ['02:00', '04:00', '06:00', '08:00', '10:00', '12:00', '14:00', '16:00', '18:00', '20:00', '22:00', '00:00']
+	PortTraffic.setOption({
+		tooltip: {
+			trigger: 'axis',
+			axisPointer: {
+				animation: false
+			},
+			formatter: '{c}Kb/s'
+		},
+		legend: {
+			x: 'left',
+			data: ['counts']
+		},
+		axisPointer: {
+			link: {
+				xAxisIndex: 'all'
+			}
+		},
+		grid: [{
+			left: 50,
+			right: 50,
+			height: '60%'
+		}, {
+			left: 50,
+			right: 50,
+			top: '-100',
+			height: '0'
+		}],
+		xAxis: [{
+				type: 'category',
+				boundaryGap: false,
+				axisLine: {
+					onZero: true
+				},
+				data: timeData,
+				axisLabel: {
+					interval: 1
+				}
+			},
+			{
+				gridIndex: 1,
+				type: 'category',
+				boundaryGap: false,
+				axisLine: {
+					onZero: true,
+					lineStyle: {
+						opacity: 0
+					}
+				},
+				//data: timeData,
+				position: 'top'
+			}
+		],
+		yAxis: [{
+				name: 'PortTraffic',
+				type: 'value',
+				//max : 24
+				nameTextStyle: {
+					fontWeight: 'bold',
+					fontSize: 14,
+					color: '#555'
+				},
+				axisLabel: {
+					formatter: '{value}Kb/s'
+				},
+				splitNumber: 5
+			},
+			{
+				gridIndex: 1,
+				name: '',
+				type: 'value',
+				inverse: true
+			}
+		],
+		series: [{
+			name: 'PortTraffic',
+			type: 'line',
+			symbolSize: 8,
+			hoverAnimation: false,
+			data: [
+				20.2, 28.1, 12.8, 20.1, 12.9, 10.6, 13.4, 12.6, 20.7, 17.8, 15.6, 15.7
+			]
+		}]
+	})*/
+
+</script>
