@@ -1,2 +1,1 @@
-# advancedJS
-some details about use of javascript
+###深入学习JavaScript
