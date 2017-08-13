@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+    </head>
+    <body>
+    <script>
+       console.log(navigator.userAgent);//无法百分之百的识别出浏览器类型，如手机设备
+       console.log(location.protocol);//url协议
+       console.log(location.host);//url域名
+       console.log(location.pathname);//url路径
+       console.log(location.search);//url   ？ 后面的内容
+       console.log(location.hash);//  #部分的字符串值
+       setTimeout(function(){//跳转
+        location.href="http://www.baidu.com";
+    },3000)
+    </script>
+    </body>
+</html>
