@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+</head>
+<body>
+	<script>
+	    //组合使用构造函数模式和原型模式，是目前在ECMAScript中使用最广泛、认同度最高的一种创建自定义类型的方法。
+		function Person(name,age,job){//构造函数模式用于定义实例属性
+			this.name=name;
+			this.age=age;
+			this.job=job;
+			this.friends=["陈友谅","张士诚"];
+		}
+
+		var person0=new Person("马大脚",40,"皇后");
+		//Person.prototype设置为等于一个以对象字面量形式创建的新对象，这时constructor属性不再指向Person了。
+		Person.prototype={//原型模式用于定义方法和共享的属性。
+			constructor:Person,
+			sayName:function(){
+				console.log(this.name);
+			}
+		}
+		var person1=new Person("朱元璋",45,"皇帝");
+		var person2=new Person("徐达",40,"将军");
+		person1.friends.push("常遇春");
+		console.log(person1.friends);
+		console.log(person2.friends);
+		console.log(person1.friends===person2.friends);
+		console.log(person1.sayName===person2.sayName);
+
+		console.log(person0.sayName);//undefined,为什么？在这个person0实例创建的时候，
+		//Person的原型对象还没有改变
+		//实例中的(__proto__)指针仅指向原型，而不指向构造函数
+	</script>
+</body>
+</html>
