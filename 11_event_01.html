@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+    </head>
+    <body>
+    <div id="divLink">
+    	 <a href="http://www.baidu.com" id="link10">百度</a>
+    	 <a href="http://www.baidu.com" id="link11">百度</a>
+    	 <a href="http://www.baidu.com" id="link12">百度</a>
+    	 <a href="http://www.baidu.com" id="link13">百度</a>
+    	 <a href="http://www.baidu.com" id="link14">百度</a>
+    	 <span id="span1">激活</span>
+    	 <span id="span2">取消</span>
+    </div>
+    <div id="div1">
+    	<a href="http://www.baidu.com" id="link1">百度</a>
+    	<p id="p1">激活</p>
+    	<p id="p2">取消</p>
+    	<a href="http://www.baidu.com" id="link100">百度</a>
+    	<a href="http://www.baidu.com" id="link110">百度</a>
+    </div>
+    <div class="div2">
+    	<p id="p3">取消</p>
+    	<p id="p4">取消</p>
+    </div>
+    <script>
+
+    // var p1=document.getElementById('p1');
+    // p1.addEventListener('click', function(e){
+    // 	console.log(e);
+    // });
+    // var link1=document.getElementById('link1');
+    // link1.addEventListener('click',function(e){
+    // 	e.preventDefault();//取消了浏览器的默认点击链接跳转的行为
+    // 	console.log(456);
+    // });
+    
+    // var link1=document.getElementById('link1');
+    // function bindEvent(elem,type,fn){//封装成一个函数，不用每次都写一个这么长的监听函数addEventListener
+    // 	elem.addEventListener(type,fn);
+    // };
+
+    // bindEvent(link1,'click',function(e){
+    // 	e.preventDefault();
+    // 	console.log(123)
+    // })
+    //实现功能，点击激活的时候，弹出激活，点击取消的时候，弹出取消
+    // var p1=document.getElementById('p1');
+    // var body=document.getElementsByTagName('body')[0];
+    // bindEvent(p1,'click',function(e){
+    // 	e.stopPropagation();//阻止时间冒泡
+    // 	alert('激活');
+    // })
+    // bindEvent(body,'click',function(e){
+    // 	alert('取消');
+    // })
+   
+    //实现一个功能，给一个div中的所有a链接，绑定事件，而且这个里面的a链接是动态增长的 
+    // var divLink=document.getElementById("divLink");
+    // bindEvent(divLink,'click',function(e){
+    // 	e.preventDefault();
+    // 	if(e.target.nodeName==='A'){
+    // 		console.log('这是一个链接')
+    // 	};
+    // })
+    // 
+    function bindEvent(elem,type,selector,fn){
+    	if(fn==null){
+    		fn=selector;
+    		selector=null;
+    	}
+    	elem.addEventListener(type,function(e){
+    		var target;
+    		if(selector){
+    			//代理
+    			target=e.target;
+    			if(target.matches(selector)){
+    				fn.call(target,e)
+    			}
+    		}else{
+    			//不是代理
+    			fn(e)
+    		}
+    	});
+    }
+
+
+    //使用事件代理
+    var div1=document.getElementById('div1')
+    bindEvent(div1,'click','a',function(e){
+    	e.preventDefault();
+    	console.log(this.innerHTML)
+    })
+
+    //不使用事件代理
+    // var p1=document.getElementById('p1')
+    // bindEvent(p1,'click',function(e){
+    // 	console.log(p1.innerHTML)
+    // })
+    </script>
+    </body>
+</html>
