@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+</head>
+<body>
+	<script>
+		var f=true;
+		if(f===true){
+			var a=10;
+		}
+		function fn(){
+			var b=20;
+			c=30;
+		}
+		fn();
+		console.log(a);//10
+		console.log(b);//报错
+		console.log(c);//30
+		//注意：只有function(){}内新声明的变量才是局部变量，while{...}/if(){...}/for(){...}之内的都是
+		//全局变量（除非本身包含在function内）
+	</script>
+</body>
+</html>
