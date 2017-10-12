@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+</head>
+<body>
+	<script>
+		var length = 10;
+		function fn(){
+			console.log(this.length);
+		}
+		var obj = {
+			length:5,
+			method:function(fn){
+				fn();//这里并非obj调用了fn，而只是让fn直执行了一下
+				arguments[0]();//相当于arguments调用方法，this指向arguments，而这里创了两个参数，故输出
+				//arguments长度为2
+			}
+		}
+		obj.method(fn,1);
+		obj.fn();//这里会报错的，fn是属于window，并非属于
+	</script>
+</body>
+</html>
