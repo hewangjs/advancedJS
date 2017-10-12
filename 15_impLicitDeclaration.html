@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+</head>
+<body>
+	<script>
+		if('a' in window){
+			var a=10;
+		}
+		alert(a);
+		//function和var会提前声明，而其实{...}内的变量也会提前声明。于是代码if(){...}还没执行前，a变量
+		//已经被声明
+	</script>
+</body>
+</html>
