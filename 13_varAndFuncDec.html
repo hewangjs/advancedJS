@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+</head>
+<body>
+	<script>
+		function fn(a){
+			console.log(a);
+			var a=2;
+			function a(){
+				console.log(a);
+			}
+			console.log(a)
+		}
+		fn(1);
+		//var和function是会提前声明的，而且function是优先var声明的（如果同时存在的话），所以提前声明后输出
+		//的a是个funciton，然后代码往下执行a进行重新赋值，故第二次输出是2
+	</script>
+</body>
+</html>
