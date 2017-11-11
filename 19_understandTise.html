@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+</head>
+<body>
+	<script>
+		//深入理解JavaScript中的this
+		//this是JavaScript中的一个关键字，它的值取决于它所在的函数如何被调用。下面是this可以获得新值得6中
+		//不同的方式
+		
+		//1 this在全局范围内   在全局环境中被调用，它默认指向window对象
+		console.log(window);//window
+
+		//2 this在对象的构造函数内   当使用new关键字创建一个对象的新的实例时，this关键字指向这个实例
+		function Human(age){
+			this.age = age;
+		}
+		let greg = new Human(22);
+		let thomas = new Human(24);
+		console.log(greg);//this.age = 22
+		console.log(thomas);//this.age = 24;
+
+		//3 this在对象的方法内      在对象的任何方法内的this都是指向对象的本身
+		let o = {
+			sayThis(){
+				console.log(this);
+			}
+		};
+		o.sayThis();//o
+		(0||o.sayThis)();//这里指向window，怎么解释？
+		//4 this在一个简单的函数内（函数声明，匿名函数）  简单函数里面的this总是指向Window，即使你在
+		//对象的方法中调用一个简单函数，在这个简单函数里面的this也是指向Window
+		function simpleFunction(){
+			console.log(this);
+		}
+
+		const p = {
+			sayThis(){
+				simpleFunction();
+			}
+		};
+		simpleFunction();//Window
+		p.sayThis();//Window
+
+		//5 this在箭头函数内  this在箭头函数中总是跟它在箭头函数所在作用域的this一样（在它直接作用域）
+		//所以，如果你在对象中使用箭头函数，箭头函数中的this总是指向这个对象本身，而不是指向Window
+		const f = {
+			doSomethingLater(){
+				setTimeout(() => this.speakLeet(),1000);
+			},
+			speakLeet(){
+				console.log('没错就是我');
+			}
+		}
+		f.doSomethingLater();//"没错就是我"
+		//第三种改变任何函数（方法）中的this值得方法是bind，call或者apply。
+		
+		//6 this在一个事件侦听器内    在事件侦听器内，this被指向的是触发这个事件的元素
+		// let button = document.querySelector('button');
+		// button.addEventListener('clcik',function(){
+		// 	console.log(this);//button
+		// })；
+
+
+		//测试题
+		var obj = {
+			foo:function(){
+				alert(this);
+			}
+		}
+		obj.foo();//obj
+		(obj.foo)();//obj
+		(0||obj.foo)();//window,为什么是window？
+       //详细解释如下，obj.foo是一个成员表达式，其值包含对象obj和属性foo两部分。成员表达式的值同时也是一个左值，
+       //即其可以用在赋值表达式的左侧，是可以被赋值的。
+       //当左值参表达式运算时，会触发左值求操作，从而将其转化成一般指（俗称，右值）之后才参与运算。
+       //这就是为什么（0||obj.foo）中的||运算符会触发obj.foo求值为函数值得缘故。
+       //答案是：包裹表达式的括号 ( ) 不会触发求值操作！
+	   //因此，( obj.foo ) 依旧返回了成员表达式的值，对其发起调用操作，就是基于对象 obj 和 属性 foo 
+	   //发起调用，所以其调用执行环境中的 obj 就是 this !
+	   var x;
+	   (x) = 123;    // 这是正确的写法，并能正确运行！
+	</script>
+</body>
+</html>
