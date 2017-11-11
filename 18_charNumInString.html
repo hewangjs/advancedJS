@@ -1,0 +1,32 @@
+git
+s<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+</head>
+<body>
+	<script>
+		var s='aaabbbcccaaabbbaaa';
+		var obj={};
+		var maxn=-1;
+		var letter;
+		for(var i=0;i<s.length;i++){
+			if(obj[s[i]]){
+				obj[s[i]]++;
+				if(obj[s[i]]>maxn){
+					maxn=obj[s[i]];
+					letter=s[i];
+				}
+			}else{
+				obj[s[i]]=1;
+				if(obj[s[i]]>maxn){
+					maxn=obj[s[i]];
+					letter=s[i];
+				}
+			}
+		}
+		alert(letter+':'+maxn);
+	</script>
+</body>
+</html>
